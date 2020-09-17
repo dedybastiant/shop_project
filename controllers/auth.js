@@ -1,4 +1,6 @@
 const bycrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
 const User = require("../models/user");
 
 exports.signup = async (req, res, next) => {
@@ -57,4 +59,40 @@ exports.signup = async (req, res, next) => {
   };
 
   res.status(201).json({ status: "success", data: userData });
+};
+
+exports.login = async (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let loadedUser;
+  const user = await User.findOne({ where: { email: email } });
+
+  if (!user) {
+    res.status(404).json({ status: "error", message: "User Not Found!" });
+  }
+
+  const isEqual = await bycrypt.compare(password, user.password);
+  if (!isEqual) {
+    return res
+      .status(403)
+      .json({ status: "error", message: "Password Incorrect" });
+  }
+
+  loadedUser = user;
+  const token = jwt.sign(
+    {
+      email: loadedUser.email,
+      userId: loadedUser.id.toString(),
+      role: loadedUser.role
+    },
+    "somesupersecretsecret",
+    { expiresIn: "1h" }
+  );
+  const loginData = {
+    email: loadedUser.email,
+    name: loadedUser.name,
+    role: loadedUser.role,
+    token: token,
+  };
+  res.status(200).json({ status: "success", data: loginData });
 };
