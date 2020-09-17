@@ -1,3 +1,5 @@
+const bycrypt = require("bcryptjs");
+
 const User = require("../models/user");
 
 exports.updateUser = async (req, res, next) => {
@@ -55,4 +57,47 @@ exports.updateUser = async (req, res, next) => {
     updatedAt: user.updatedAt,
   };
   res.status(200).json({ status: "success", data: userData });
+};
+
+exports.changePassword = async (req, res, next) => {
+  if (!req.isAuth) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const userId = req.userId;
+  const oldPassword = req.body.oldPassword;
+  const newPassword = req.body.newPassword;
+  const newPasswordConfirmation = req.body.newPasswordConfirmation;
+
+  const user = await User.findByPk(userId);
+  console.log(user);
+  const isEqual = await bycrypt.compare(oldPassword, user.password);
+  if (!isEqual) {
+    return res.status(401).json({
+      status: "error",
+      message: "Old Password Incorrect",
+    });
+  }
+
+  if (newPassword !== newPasswordConfirmation) {
+    return res.status(400).json({
+      status: "error",
+      message: "New Password Confirmation Incorrect",
+    });
+  }
+
+  if (newPassword === ("" || null) || newPasswordConfirmation === ("" || null)) {
+    return res.status(400).json({
+      status: "error",
+      message: "Password Should Not Empty",
+    });
+  }
+
+  const hashedPw = await bycrypt.hash(newPassword, 12);
+  await user.update({
+    password: hashedPw,
+  });
+  await user.save();
+
+  res.status(200).json({ status: "success", message: "Password successfully changed" });
 };
