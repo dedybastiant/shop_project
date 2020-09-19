@@ -8,4 +8,6 @@ router.put("/user", isAuth, userController.updateUser);
 
 router.put("/user/change-password", isAuth, userController.changePassword);
 
+router.get("/user", isAuth, userController.getUserByQuery);
+
 module.exports = router;

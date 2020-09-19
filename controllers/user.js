@@ -1,6 +1,8 @@
 const bycrypt = require("bcryptjs");
-
+const { Sequelize } = require("../utils/database");
 const User = require("../models/user");
+
+const Op = Sequelize.Op;
 
 exports.updateUser = async (req, res, next) => {
   if (!req.isAuth) {
@@ -86,7 +88,10 @@ exports.changePassword = async (req, res, next) => {
     });
   }
 
-  if (newPassword === ("" || null) || newPasswordConfirmation === ("" || null)) {
+  if (
+    newPassword === ("" || null) ||
+    newPasswordConfirmation === ("" || null)
+  ) {
     return res.status(400).json({
       status: "error",
       message: "Password Should Not Empty",
@@ -99,5 +104,40 @@ exports.changePassword = async (req, res, next) => {
   });
   await user.save();
 
-  res.status(200).json({ status: "success", message: "Password successfully changed" });
+  res
+    .status(200)
+    .json({ status: "success", message: "Password successfully changed" });
+};
+
+exports.getUserByQuery = async (req, res, next) => {
+  if (!req.isAuth || req.userRole !== "admin") {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const query = {};
+  if (req.query.email) {
+    query.email = { [Op.like]: `%${req.query.email}%` };
+  }
+  if (req.query.name) {
+    query.name = { [Op.like]: `%${req.query.name}%` };
+  }
+  if (req.query.phoneNumber) {
+    query.phone_number = { [Op.like]: `%${req.query.phoneNumber}%` };
+  }
+
+  const users = await User.findAll({ where: query });
+  const userData = [];
+  users.map((user) => {
+    const data = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      phoneNumber: user.phone_number,
+      createdAt: user.createdAt,
+      updatedBy: user.updatedBy,
+      updatedAt: user.updatedAt,
+    };
+    userData.push(data);
+  });
+  res.status(200).json({ status: "success", data: userData });
 };
