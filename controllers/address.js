@@ -155,12 +155,14 @@ exports.getAddressList = async (req, res, next) => {
 
   const addressData = [];
   addresses.map(address => {
-    const data = {
-      id: address.id,
-      userId: address.user_id,
-      address: address.address,
-    };
-    addressData.push(data);
+    if (address.is_active === true) {
+      const data = {
+        id: address.id,
+        userId: address.user_id,
+        address: address.address,
+      };
+      addressData.push(data);
+    }
   });
   res.status(200).json({ status: "success", data: addressData });
 };
@@ -169,7 +171,7 @@ exports.getAddressById = async (req, res, next) => {
   if (!req.isAuth) {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
-  
+
   const userId = req.userId;
   const user = await User.findByPk(req.userId);
   if (!user) {
