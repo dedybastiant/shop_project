@@ -12,4 +12,6 @@ router.delete("/address/:addressId", isAuth, addressController.deleteAddress);
 
 router.get("/address", isAuth, addressController.getAddressList);
 
+router.get("/address/:addressId", isAuth, addressController.getAddressById);
+
 module.exports = router;

@@ -138,7 +138,7 @@ exports.getAddressList = async (req, res, next) => {
   if (!req.isAuth) {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
-  
+
   const userId = req.userId;
   const user = await User.findByPk(req.userId);
   if (!user) {
@@ -163,4 +163,44 @@ exports.getAddressList = async (req, res, next) => {
     addressData.push(data);
   });
   res.status(200).json({ status: "success", data: addressData });
+};
+
+exports.getAddressById = async (req, res, next) => {
+  if (!req.isAuth) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  
+  const userId = req.userId;
+  const user = await User.findByPk(req.userId);
+  if (!user) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "User Not Found!" });
+  }
+
+  const addressId = req.params.addressId;
+  const address = await Address.findByPk(addressId);
+  if (address.dataValues.is_active === false) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Address Already Deleted." });
+  }
+
+  if (address.dataValues.user_id.toString() !== userId) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const addressData = {
+    id: address.id,
+    address: address.address,
+    postalCode: address.postal_code,
+    disctrict: address.district,
+    city: address.city,
+    province: address.province,
+    createdBy: address.createdBy,
+    createdAt: address.createdAt,
+    updatedBy: address.updatedBy,
+    updatedAt: address.updatedAt,
+  };
+  res.status(201).json({ status: "success", data: addressData });
 };
