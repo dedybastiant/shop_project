@@ -10,4 +10,6 @@ router.put("/user/change-password", isAuth, userController.changePassword);
 
 router.get("/user", isAuth, userController.getUserByQuery);
 
+router.get("/user/:userId", isAuth, userController.getUserById);
+
 module.exports = router;

@@ -141,3 +141,22 @@ exports.getUserByQuery = async (req, res, next) => {
   });
   res.status(200).json({ status: "success", data: userData });
 };
+
+exports.getUserById = async (req, res, next) => {
+  if (!req.isAuth) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const userId = req.userId;
+  const user = await User.findByPk(userId);
+  const userData = {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    phoneNumber: user.phone_number,
+    createdAt: user.createdAt,
+    updatedBy: user.updatedBy,
+    updatedAt: user.updatedAt,
+  };
+  res.status(200).json({ status: "success", data: userData });
+};
