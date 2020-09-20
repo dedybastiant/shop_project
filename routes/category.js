@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.post("/category", isAuth, categoryController.AddNewCategory);
 
+router.put("/category/:categoryId", isAuth, categoryController.updateCategory);
+
 module.exports = router;
