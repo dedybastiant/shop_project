@@ -26,6 +26,7 @@ exports.addNewAddress = async (req, res, next) => {
     city: city,
     province: province,
     user_id: userId,
+    is_active: true,
     createdBy: userId,
     updatedBy: null,
   });
@@ -92,4 +93,34 @@ exports.updateAddress = async (req, res, next) => {
     updatedAt: address.updatedAt,
   };
   res.status(200).json({ status: "success", data: addressData });
+};
+
+exports.deleteAddress = async (req, res, next) => {
+  if (!req.isAuth) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const userId = req.userId;
+  const user = await User.findByPk(userId);
+  if (!user) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "User Not Found!" });
+  }
+
+  const addressId = req.params.addressId;
+  const address = await Address.findByPk(addressId);
+  if (address.dataValues.is_active === false) {
+    return res.status(400).json({ status: "error", message: "Address Already Deleted." });
+  }
+
+  if (address.dataValues.user_id.toString() !== userId) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  await address.update({
+    is_active: false,
+  });
+  await address.save();
+  res.status(200).json({ status: "success", message: "Address Deleted!" });
 };

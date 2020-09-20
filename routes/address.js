@@ -8,4 +8,6 @@ router.post("/address", isAuth, addressController.addNewAddress);
 
 router.put("/address/:addressId", isAuth, addressController.updateAddress);
 
+router.delete("/address/:addressId", isAuth, addressController.deleteAddress);
+
 module.exports = router;

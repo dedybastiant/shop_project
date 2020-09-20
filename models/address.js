@@ -1,46 +1,50 @@
-const Sequelize = require('sequelize');
+const Sequelize = require("sequelize");
 
-const sequelize = require('../utils/database');
+const sequelize = require("../utils/database");
 
-const Address = sequelize.define('address', {
+const Address = sequelize.define("address", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     allowNull: false,
-    primaryKey: true
+    primaryKey: true,
   },
   address: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   postal_code: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   district: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   city: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   province: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   user_id: {
     type: Sequelize.INTEGER,
-    allowNull: false
+    allowNull: false,
+  },
+  is_active: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
   },
   createdBy: {
     type: Sequelize.INTEGER,
-    allowNull: true
+    allowNull: true,
   },
   updatedBy: {
     type: Sequelize.INTEGER,
-    allowNull: true
-  }
+    allowNull: true,
+  },
 });
 
 module.exports = Address;
