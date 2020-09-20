@@ -13,6 +13,10 @@ const Category = sequelize.define("category", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  is_active: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+  },
   createdBy: {
     type: Sequelize.INTEGER,
   },

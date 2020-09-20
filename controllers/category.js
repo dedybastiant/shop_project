@@ -8,6 +8,7 @@ exports.AddNewCategory = async (req, res, next) => {
   const userId = req.userId;
   const category = await Category.create({
     category_name: req.body.category,
+    is_active: true,
     createdBy: userId,
     updateBy: null,
   });
