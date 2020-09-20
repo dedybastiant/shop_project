@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.post("/address", isAuth, addressController.addNewAddress);
 
-// router.post("/login", addressController.login);
+router.put("/address/:addressId", isAuth, addressController.updateAddress);
 
 module.exports = router;
