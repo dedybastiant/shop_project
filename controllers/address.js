@@ -67,9 +67,14 @@ exports.updateAddress = async (req, res, next) => {
   const city = req.body.city;
   const province = req.body.province;
   const address = await Address.findByPk(addressId);
+  if (address.dataValues.is_active === false) {
+    return res.status(400).json({ status: "error", message: "Address Already Deleted." });
+  }
+
   if (address.dataValues.user_id.toString() !== userId) {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
+  
   await address.update({
     address: addressDescription,
     postal_code: postalCode,
