@@ -62,5 +62,26 @@ exports.deleteCategory = async (req, res, next) => {
     updatedBy: userId,
   });
   await category.save();
-  res.status(200).json({ status: "success", message: "Category Successfully Deleted!"});
+  res
+    .status(200)
+    .json({ status: "success", message: "Category Successfully Deleted!" });
+};
+
+exports.getCategoryById = async (req, res, next) => {
+  if (!req.isAuth || req.userRole !== "admin") {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const categoryId = req.params.categoryId;
+  const category = await Category.findByPk(categoryId);
+  const categoryData = {
+    id: category.id,
+    category: category.category_name,
+    createdBy: category.createdBy,
+    createdAt: category.createdAt,
+    updatedBy: category.updatedBy,
+    updatedAt: category.updatedAt,
+  };
+  await category.save();
+  res.status(200).json({ status: "success", data: categoryData });
 };
