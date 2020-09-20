@@ -12,4 +12,6 @@ router.delete("/category/:categoryId", isAuth, categoryController.deleteCategory
 
 router.get("/category/:categoryId", isAuth, categoryController.getCategoryById);
 
+router.get("/category/", isAuth, categoryController.getCategoryByQuery);
+
 module.exports = router;
