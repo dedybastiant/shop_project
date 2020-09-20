@@ -68,13 +68,15 @@ exports.updateAddress = async (req, res, next) => {
   const province = req.body.province;
   const address = await Address.findByPk(addressId);
   if (address.dataValues.is_active === false) {
-    return res.status(400).json({ status: "error", message: "Address Already Deleted." });
+    return res
+      .status(400)
+      .json({ status: "error", message: "Address Already Deleted." });
   }
 
   if (address.dataValues.user_id.toString() !== userId) {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
-  
+
   await address.update({
     address: addressDescription,
     postal_code: postalCode,
@@ -116,7 +118,9 @@ exports.deleteAddress = async (req, res, next) => {
   const addressId = req.params.addressId;
   const address = await Address.findByPk(addressId);
   if (address.dataValues.is_active === false) {
-    return res.status(400).json({ status: "error", message: "Address Already Deleted." });
+    return res
+      .status(400)
+      .json({ status: "error", message: "Address Already Deleted." });
   }
 
   if (address.dataValues.user_id.toString() !== userId) {
@@ -128,4 +132,35 @@ exports.deleteAddress = async (req, res, next) => {
   });
   await address.save();
   res.status(200).json({ status: "success", message: "Address Deleted!" });
+};
+
+exports.getAddressList = async (req, res, next) => {
+  if (!req.isAuth) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  
+  const userId = req.userId;
+  const user = await User.findByPk(req.userId);
+  if (!user) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "User Not Found!" });
+  }
+
+  const addresses = await Address.findAll({
+    where: {
+      user_id: userId,
+    },
+  });
+
+  const addressData = [];
+  addresses.map(address => {
+    const data = {
+      id: address.id,
+      userId: address.user_id,
+      address: address.address,
+    };
+    addressData.push(data);
+  });
+  res.status(200).json({ status: "success", data: addressData });
 };

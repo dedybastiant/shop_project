@@ -10,4 +10,6 @@ router.put("/address/:addressId", isAuth, addressController.updateAddress);
 
 router.delete("/address/:addressId", isAuth, addressController.deleteAddress);
 
+router.get("/address", isAuth, addressController.getAddressList);
+
 module.exports = router;
