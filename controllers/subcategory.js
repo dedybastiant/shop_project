@@ -97,3 +97,27 @@ exports.deleteSubcategory = async (req, res, next) => {
     .status(201)
     .json({ status: "success", message: "Subcategory Successfully Deleted!" });
 };
+
+exports.getSubcategoryById = async (req, res, next) => {
+  if (!req.isAuth || req.userRole !== "admin") {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const subcategoryId = req.params.subcategoryId;
+  const subcategory = await Subcategory.findByPk(subcategoryId);
+  if (!subcategory || subcategory.is_active === false) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Subcategory Not Found!" });
+  }
+  const subdatgoryData = {
+    id: subcategory.id,
+    categoryId: subcategory.category_id,
+    subcategory: subcategory.subcategory_name,
+    createdBy: subcategory.createdBy,
+    createdAt: subcategory.createdAt,
+    updatedBy: subcategory.updatedBy,
+    updatedAt: subcategory.updatedAt,
+  };
+  res.status(201).json({ status: "success", data: subdatgoryData });
+};
