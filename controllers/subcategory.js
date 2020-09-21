@@ -18,6 +18,7 @@ exports.AddNewSubcategory = async (req, res, next) => {
   const subcategory = await Subcategory.create({
     category_id: categoryId,
     subcategory_name: subcategoryName,
+    is_active: true,
     createdBy: userId,
     updatedBy: null,
   });

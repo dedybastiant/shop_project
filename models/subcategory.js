@@ -16,6 +16,16 @@ const Subcategory = sequelize.define('subcategory', {
   subcategory_name: {
     type: Sequelize.STRING,
     allowNull: false
+  },
+  is_active: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false
+  },
+  createdBy: {
+    type: Sequelize.INTEGER
+  },
+  updatedBy: {
+    type: Sequelize.INTEGER
   }
 });
 
