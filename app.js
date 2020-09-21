@@ -8,6 +8,7 @@ const userRoutes = require("./routes/user");
 const addressRoutes = require("./routes/address");
 const categoryRoutes = require("./routes/category");
 const subcategoryRoutes = require("./routes/subcategory");
+const productRoutes = require("./routes/product");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(userRoutes);
 app.use(addressRoutes);
 app.use(categoryRoutes);
 app.use(subcategoryRoutes);
+app.use(productRoutes);
 
 sequelize
   .sync({ force: true })
