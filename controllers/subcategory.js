@@ -1,6 +1,5 @@
 const Subcategory = require("../models/subcategory");
 const Category = require("../models/category");
-const { reset } = require("nodemon");
 
 exports.AddNewSubcategory = async (req, res, next) => {
   if (!req.isAuth || req.userRole !== "admin") {
@@ -120,4 +119,43 @@ exports.getSubcategoryById = async (req, res, next) => {
     updatedAt: subcategory.updatedAt,
   };
   res.status(201).json({ status: "success", data: subdatgoryData });
+};
+
+exports.getSubcategoryByQuery = async (req, res, next) => {
+  if (!req.isAuth || req.userRole !== "admin") {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const categoryId = req.query.categoryId;
+  const subcategoryName = req.query.subcategoryName;
+  const is_active = req.query.is_active;
+  const query = {};
+  if (categoryId) {
+    query.categoryId = { [Op.like]: `%${categoryId}%` };
+  }
+  if (subcategoryName) {
+    query.subcategoryName = { [Op.like]: `%${subcategoryName}%` };
+  }
+  if (is_active) {
+    if (is_active === "true") {
+      query.is_active = true;
+    } else if (is_active === "false") {
+      query.is_active = false;
+    }
+  }
+  const subcategories = await Subcategory.findAll({ where: query });
+  const subcategoryData = [];
+  subcategories.map((subcategory) => {
+    const data = {
+      id: subcategory.id,
+      categoryId: subcategory.category_id,
+      subcategory: subcategory.subcategory_name,
+      createdBy: subcategory.createdBy,
+      createdAt: subcategory.createdAt,
+      updatedBy: subcategory.updatedBy,
+      updatedAt: subcategory.updatedAt,
+    };
+    subcategoryData.push(data);
+  });
+  res.status(200).json({ status: "success", data: subcategoryData });
 };
