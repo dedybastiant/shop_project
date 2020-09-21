@@ -8,4 +8,6 @@ router.post("/subcategory", isAuth, subcategoryController.AddNewSubcategory);
 
 router.put("/subcategory/:subcategoryId", isAuth, subcategoryController.updateSubcategory);
 
+router.delete("/subcategory/:subcategoryId", isAuth, subcategoryController.deleteSubcategory);
+
 module.exports = router;

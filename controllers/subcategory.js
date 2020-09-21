@@ -1,5 +1,6 @@
 const Subcategory = require("../models/subcategory");
 const Category = require("../models/category");
+const { reset } = require("nodemon");
 
 exports.AddNewSubcategory = async (req, res, next) => {
   if (!req.isAuth || req.userRole !== "admin") {
@@ -72,4 +73,27 @@ exports.updateSubcategory = async (req, res, next) => {
     updatedAt: subcategory.updatedAt,
   };
   res.status(201).json({ status: "success", data: subcategoryData });
+};
+
+exports.deleteSubcategory = async (req, res, next) => {
+  if (!req.isAuth || req.userRole !== "admin") {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const userId = req.userId;
+  const subcategoryId = req.params.subcategoryId;
+  const subcategory = await Subcategory.findByPk(subcategoryId);
+  if (!subcategory || subcategory.is_active === false) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Subcategory Not Found!" });
+  }
+  await subcategory.update({
+    is_active: false,
+    updatedBy: userId,
+  });
+  await subcategory.save();
+  res
+    .status(201)
+    .json({ status: "success", message: "Subcategory Successfully Deleted!" });
 };
