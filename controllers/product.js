@@ -104,3 +104,33 @@ exports.updateProduct = async (req, res, next) => {
   };
   res.status(200).json({ status: "success", data: productData });
 };
+
+exports.getProductById = async (req, res, next) => {
+  if (!req.isAuth || req.userRole !== "admin") {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const productId = req.params.productId;
+  const product = await Product.findByPk(productId);
+  if (!product) {
+    return res.status(404).json({ message: "Product Not Found!" });
+  }
+  const productData = {
+    id: product.id,
+    name: product.product_name,
+    brand: product.product_brand,
+    description: product.product_description,
+    price: product.product_price,
+    category: product.product_category,
+    subcategory: product.product_subcategory,
+    sku: product.product_sku,
+    newProductFlag: product.new_product_flag,
+    recommendationFlag: product.recommend_product_flag,
+    rating: product.product_rating,
+    createdBy: product.createdBy,
+    createdAt: product.createdAt,
+    updatedBy: product.updatedBy,
+    updatedAt: product.updatedAt,
+  };
+  res.status(200).json({ status: "success", data: productData });
+};
