@@ -1,5 +1,7 @@
 const Product = require("../models/product");
 // const ProductImage = require('../models/product_image');
+const { Sequelize } = require("../utils/database");
+const Op = Sequelize.Op;
 
 exports.addNewProduct = async (req, res, next) => {
   if (!req.isAuth || req.userRole !== "admin") {
@@ -133,4 +135,51 @@ exports.getProductById = async (req, res, next) => {
     updatedAt: product.updatedAt,
   };
   res.status(200).json({ status: "success", data: productData });
+};
+
+exports.getProductByQuery = async (req, res, next) => {
+  if (!req.isAuth) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const productName = req.query.name;
+  const productBrand = req.query.brand;
+  const isActive = req.query.isActive;
+  const query = {};
+  if (productName) {
+    query.product_name = { [Op.like]: `%${req.query.name}%` };
+  }
+  if (productBrand) {
+    query.product_brand = { [Op.like]: `%${req.query.brand}%` };
+  }
+  if (isActive) {
+    if (isActive === "true") {
+      query.is_active = true;
+    } else if (isActive === "false") {
+      query.is_active = false;
+    }
+  }
+  const products = await Product.findAll({ where: query });
+  const productsData = [];
+  products.map((product) => {
+    const data = {
+      id: product.id,
+      name: product.product_name,
+      brand: product.product_brand,
+      description: product.product_description,
+      price: product.product_price,
+      category: product.product_category,
+      subcategory: product.product_subcategory,
+      sku: product.product_sku,
+      newProductFlag: product.new_product_flag,
+      recommendationFlag: product.recommend_product_flag,
+      rating: product.product_rating,
+      createdBy: product.createdBy,
+      createdAt: product.createdAt,
+      updatedBy: product.updatedBy,
+      updatedAt: product.updatedAt,
+    };
+    productsData.push(data);
+  });
+  res.status(200).json({ status: "success", data: productsData });
 };

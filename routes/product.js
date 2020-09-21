@@ -10,4 +10,6 @@ router.put("/product/:productId", isAuth, productController.updateProduct);
 
 router.get("/product/:productId", isAuth, productController.getProductById);
 
+router.get("/products", isAuth, productController.getProductByQuery);
+
 module.exports = router;
