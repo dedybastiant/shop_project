@@ -34,7 +34,7 @@ exports.AddNewSubcategory = async (req, res, next) => {
   res.status(201).json({ status: "success", data: subcategoryData });
 };
 
-exports.updateCategory = async (req, res, next) => {
+exports.updateSubcategory = async (req, res, next) => {
   if (!req.isAuth || req.userRole !== "admin") {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
@@ -50,6 +50,11 @@ exports.updateCategory = async (req, res, next) => {
       .json({ status: "error", message: "Category Not Found!" });
   }
   const subcategory = await Subcategory.findByPk(subcategoryId);
+  if (!subcategory) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "Subcategory Not Found!" });
+  }
   await subcategory.update({
     category_id: categoryId,
     subcategory_name: subcategoryName,

@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.post("/subcategory", isAuth, subcategoryController.AddNewSubcategory);
 
-router.put("/subcategory/:subcategoryId", isAuth, subcategoryController.updateCategory);
+router.put("/subcategory/:subcategoryId", isAuth, subcategoryController.updateSubcategory);
 
 module.exports = router;
