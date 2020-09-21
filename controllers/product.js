@@ -108,7 +108,7 @@ exports.updateProduct = async (req, res, next) => {
 };
 
 exports.getProductById = async (req, res, next) => {
-  if (!req.isAuth || req.userRole !== "admin") {
+  if (!req.isAuth) {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
 
@@ -182,4 +182,23 @@ exports.getProductByQuery = async (req, res, next) => {
     productsData.push(data);
   });
   res.status(200).json({ status: "success", data: productsData });
+};
+
+exports.deleteProduct = async (req, res, next) => {
+  if (!req.isAuth || req.userRole !== "admin") {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  const productId = req.params.productId;
+  const product = await Product.findByPk(productId);
+  if (!product) {
+    return res.status(404).json({ message: "Product Not Found!" });
+  }
+  await product.update({
+    is_active: false,
+  });
+  await product.save();
+  res
+    .status(200)
+    .json({ status: "success", message: "Product Successfully Deleted!" });
 };
