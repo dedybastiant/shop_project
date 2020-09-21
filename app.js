@@ -7,6 +7,7 @@ const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const addressRoutes = require("./routes/address");
 const categoryRoutes = require("./routes/category");
+const subcategoryRoutes = require("./routes/subcategory");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(authRoutes);
 app.use(userRoutes);
 app.use(addressRoutes);
 app.use(categoryRoutes);
+app.use(subcategoryRoutes);
 
 sequelize
   .sync({ force: true })
