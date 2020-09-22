@@ -221,3 +221,43 @@ exports.getCartById = async (req, res, next) => {
 
   res.status(200).json({ status: "success", data: cartData });
 };
+
+exports.getCartByQuery = async (req, res, next) => {
+  const userId = req.userId;
+
+  const queryUserId = req.query.userId;
+  const queryIsActive = req.query.is_active;
+  const query = {};
+  if (queryUserId) {
+    query.user_id = queryUserId;
+  }
+  if (queryIsActive) {
+    if (queryIsActive === "true") {
+      query.is_active = true;
+    } else if (queryIsActive === "false") {
+      query.is_active = false;
+    }
+  }
+  const carts = await Cart.findAll({ where: query });
+  if (carts.length < 1) {
+    return res.status(404).json({ status: "error", message: "No Cart Found!" });
+  }
+
+  const cartData = [];
+  carts.map((cart) => {
+    const data = {
+      id: cart.id,
+      userId: cart.user_id,
+      totalQuantity: cart.total_item,
+      totalPrice: cart.total_price,
+      is_active: cart.is_active,
+      createdBy: cart.createdBy,
+      createdAt: cart.createdAt,
+      updatedBy: cart.updatedBy,
+      updatedAt: cart.updatedAt,
+    };
+    cartData.push(data);
+  });
+
+  res.status(200).json({ status: "success", data: cartData });
+};
