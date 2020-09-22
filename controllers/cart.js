@@ -1,6 +1,8 @@
 const Cart = require("../models/cart");
 const CartDetail = require("../models/cart_detail");
 const Product = require("../models/product");
+const Sequelize = require("sequelize").Sequelize;
+const Op = Sequelize.Op;
 
 exports.addToCart = async (req, res, next) => {
   const userId = req.userId;
@@ -92,15 +94,15 @@ exports.updateCart = async (req, res, next) => {
     },
   });
 
-	if (quantity < 1) {
-		await cartDetail.destroy();
-	} else {
-		await cartDetail.update({
-			quantity: quantity,
-			price: product.product_price * quantity,
-			updatedBy: userId,
-		});
-	}
+  if (quantity < 1) {
+    await cartDetail.destroy();
+  } else {
+    await cartDetail.update({
+      quantity: quantity,
+      price: product.product_price * quantity,
+      updatedBy: userId,
+    });
+  }
 
   const newCartDetail = await CartDetail.findAll({
     where: {
@@ -124,4 +126,46 @@ exports.updateCart = async (req, res, next) => {
   res
     .status(200)
     .json({ status: "success", message: "Cart Successfully Updated" });
+};
+
+exports.deleteCartItem = async (req, res, next) => {
+  const userId = req.userId;
+  const cartId = req.params.cartId;
+  const productIds = req.query.productId.split(",");
+
+  const cartDetail = await CartDetail.destroy({
+    where: {
+      cart_id: cartId,
+      product_id: {
+        [Op.in]: productIds,
+      },
+    },
+  });
+
+  const newCartDetail = await CartDetail.findAll({
+    where: {
+      cart_id: cartId,
+    },
+  });
+
+  let newTotalQuantity = 0;
+  let newTotalPrice = 0;
+  newCartDetail.map((cart) => {
+    newTotalQuantity += cart.quantity;
+    newTotalPrice += cart.price;
+  });
+
+  const cart = await Cart.findByPk(cartId);
+  if (newTotalQuantity === 0) {
+    cart.destroy();
+  } else {
+    cart.update({
+      total_item: newTotalQuantity,
+      total_price: newTotalPrice,
+    });
+  }
+
+  res
+    .status(200)
+    .json({ status: "success", message: "CartItem Successfully Deleted!" });
 };
