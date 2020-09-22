@@ -74,3 +74,54 @@ exports.addToCart = async (req, res, next) => {
     .status(200)
     .json({ status: "success", message: "Item Successfully Added To Cart" });
 };
+
+exports.updateCart = async (req, res, next) => {
+  const userId = req.userId;
+  const cartId = req.query.cartId;
+  const productId = req.body.productId;
+  const quantity = req.body.quantity;
+  const product = await Product.findByPk(productId);
+  if (!product) {
+    return res.status(404).json({ message: "Product Not Found!" });
+  }
+
+  const cartDetail = await CartDetail.findOne({
+    where: {
+      cart_id: cartId,
+      product_id: productId,
+    },
+  });
+
+	if (quantity < 1) {
+		await cartDetail.destroy();
+	} else {
+		await cartDetail.update({
+			quantity: quantity,
+			price: product.product_price * quantity,
+			updatedBy: userId,
+		});
+	}
+
+  const newCartDetail = await CartDetail.findAll({
+    where: {
+      cart_id: cartId,
+    },
+  });
+
+  let newTotalQuantity = 0;
+  let newTotalPrice = 0;
+  newCartDetail.map((cart) => {
+    newTotalQuantity += cart.quantity;
+    newTotalPrice += cart.price;
+  });
+
+  const cart = await Cart.findByPk(cartId);
+  cart.update({
+    total_item: newTotalQuantity,
+    total_price: newTotalPrice,
+  });
+
+  res
+    .status(200)
+    .json({ status: "success", message: "Cart Successfully Updated" });
+};
