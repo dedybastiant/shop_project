@@ -9,6 +9,7 @@ const addressRoutes = require("./routes/address");
 const categoryRoutes = require("./routes/category");
 const subcategoryRoutes = require("./routes/subcategory");
 const productRoutes = require("./routes/product");
+const cartRoutes = require("./routes/cart");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(addressRoutes);
 app.use(categoryRoutes);
 app.use(subcategoryRoutes);
 app.use(productRoutes);
+app.use(cartRoutes);
 
 sequelize
   .sync({ force: true })
