@@ -22,6 +22,12 @@ app.use(categoryRoutes);
 app.use(subcategoryRoutes);
 app.use(productRoutes);
 app.use(cartRoutes);
+app.use((error, req, res, next) => {
+  const status = error.statusCode || 500;
+  const message = error.message;
+  const data = error.data;
+  res.status(status).json({ status: 'error', message: message, data: data });
+});
 
 sequelize
   // .sync({ force: true })
