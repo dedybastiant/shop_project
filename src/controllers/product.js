@@ -1,9 +1,16 @@
+const { validationResult } = require("express-validator/check");
 const Product = require("../models/product");
 const { Sequelize } = require("../utils/database");
 const Op = Sequelize.Op;
 
 exports.addNewProduct = async (req, res, next) => {
-	console.log(req.files);
+	const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error("Validation failed.");
+    error.statusCode = 422;
+    error.data = errors.array();
+    return next(error);
+  }
   if (req.userRole !== "admin") {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
@@ -22,7 +29,6 @@ exports.addNewProduct = async (req, res, next) => {
 	await req.files.map(file => {
 		productImages.imageUrl.push(file.path)
 	});
-	console.log(productImages)
   const product = await Product.create({
     product_name: name,
     product_brand: brand,
@@ -59,7 +65,14 @@ exports.addNewProduct = async (req, res, next) => {
 };
 
 exports.updateProduct = async (req, res, next) => {
-  if (!req.isAuth || req.userRole !== "admin") {
+	const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error("Validation failed.");
+    error.statusCode = 422;
+    error.data = errors.array();
+    next(error);
+	}
+  if (req.userRole !== "admin") {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
 
@@ -112,10 +125,6 @@ exports.updateProduct = async (req, res, next) => {
 };
 
 exports.getProductById = async (req, res, next) => {
-  if (!req.isAuth) {
-    return res.status(401).json({ status: "error", message: "Unauthorized" });
-  }
-
   const productId = req.params.productId;
   const product = await Product.findByPk(productId);
   if (!product) {
@@ -142,10 +151,6 @@ exports.getProductById = async (req, res, next) => {
 };
 
 exports.getProductByQuery = async (req, res, next) => {
-  if (!req.isAuth) {
-    return res.status(401).json({ status: "error", message: "Unauthorized" });
-  }
-
   const productName = req.query.name;
   const productBrand = req.query.brand;
   const isActive = req.query.isActive;
@@ -189,10 +194,16 @@ exports.getProductByQuery = async (req, res, next) => {
 };
 
 exports.deleteProduct = async (req, res, next) => {
-  if (!req.isAuth || req.userRole !== "admin") {
+	const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error("Validation failed.");
+    error.statusCode = 422;
+    error.data = errors.array();
+    next(error);
+	}
+  if (req.userRole !== "admin") {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
-
   const productId = req.params.productId;
   const product = await Product.findByPk(productId);
   if (!product) {

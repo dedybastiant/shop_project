@@ -24,9 +24,12 @@ app.use(productRoutes);
 app.use(cartRoutes);
 app.use((error, req, res, next) => {
   const status = error.statusCode || 500;
-  const message = error.message;
-  const data = error.data;
-  res.status(status).json({ status: "error", message: message, description: data[0].msg});
+	const message = error.message;
+	let data;
+	if (error.data) {
+		data = error.data[0].msg;
+	}
+  res.status(status).json({ status: "error", message: message, description: data});
 });
 
 sequelize

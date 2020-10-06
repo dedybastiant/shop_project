@@ -72,7 +72,6 @@ exports.changePassword = async (req, res, next) => {
   const newPasswordConfirmation = req.body.newPasswordConfirmation;
 
   const user = await User.findByPk(userId);
-  console.log(user);
   const isEqual = await bycrypt.compare(oldPassword, user.password);
   if (!isEqual) {
     return res.status(401).json({
