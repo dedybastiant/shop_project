@@ -39,7 +39,7 @@ const Product = sequelize.define('product', {
 	},
 	product_images: {
 		type: Sequelize.JSON,
-		allowNull: true
+		allowNull: false
 	},
   new_product_flag: {
     type: Sequelize.BOOLEAN,
