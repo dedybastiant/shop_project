@@ -11,11 +11,13 @@ router.post(
 			.isEmail().withMessage("Email format is invalid"),
 		body("password")
 			.not().isEmpty().withMessage("Password can't be empty!")
-			.isLength({min: 6}).withMessage("Password must equal or greater than 6 character")
+			.isLength({min: 6}).withMessage("Password must equal or greater than 6 character"),
+		body("passwordConfirmation")
 			.custom((value, {req}) => {
-				if (value !== req.body.passwordConfirmation) {
-					throw new Error('Password and Password Confirmation not match!')
+				if (value !== req.body.password) {
+					throw new Error('Password confirmation does not match password');
 				}
+				return true;
 			})
 		],
   authController.signup

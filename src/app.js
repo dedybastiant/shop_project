@@ -1,5 +1,5 @@
 const express = require("express");
-const bodyParser = require ("body-parser");
+const bodyParser = require("body-parser");
 
 const sequelize = require("./utils/database");
 
@@ -26,7 +26,7 @@ app.use((error, req, res, next) => {
   const status = error.statusCode || 500;
   const message = error.message;
   const data = error.data;
-  res.status(status).json({ status: 'error', message: message, data: data });
+  res.status(status).json({ status: "error", message: message, description: data[0].msg});
 });
 
 sequelize
