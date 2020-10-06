@@ -10,4 +10,8 @@ router.put("/cart", isAuth, cartController.updateCart);
 
 router.delete("/cart/:cartId", isAuth, cartController.deleteCartItem);
 
+router.get("/cart/:cartId", isAuth, cartController.getCartById);
+
+router.get("/cart/", isAuth, cartController.getCartByQuery);
+
 module.exports = router;

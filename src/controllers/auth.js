@@ -1,21 +1,22 @@
+const { validationResult } = require("express-validator/check");
 const bycrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
 
 exports.signup = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error("Validation failed.");
+    error.statusCode = 422;
+    error.data = errors.array();
+    next(error);
+  }
   const email = req.body.email;
   const password = req.body.password;
-  const passwordConfirmation = req.body.password_confirmation;
   const name = req.body.name;
   const phoneNumber = req.body.phoneNumber;
   const role = req.body.role;
-
-  if (password !== passwordConfirmation) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "Password Confirmation Not Match" });
-  }
 
   if (role !== "admin" && role !== "buyer") {
     return res
@@ -83,7 +84,7 @@ exports.login = async (req, res, next) => {
     {
       email: loadedUser.email,
       userId: loadedUser.id.toString(),
-      role: loadedUser.role
+      role: loadedUser.role,
     },
     "somesupersecretsecret",
     { expiresIn: "1h" }

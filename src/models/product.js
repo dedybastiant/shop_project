@@ -36,7 +36,11 @@ const Product = sequelize.define('product', {
   product_sku: {
     type: Sequelize.STRING,
     allowNull: false
-  },
+	},
+	product_images: {
+		type: Sequelize.JSON,
+		allowNull: true
+	},
   new_product_flag: {
     type: Sequelize.BOOLEAN,
     allowNull: false

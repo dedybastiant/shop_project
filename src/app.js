@@ -1,5 +1,5 @@
 const express = require("express");
-const bodyParser = require ("body-parser");
+const bodyParser = require("body-parser");
 
 const sequelize = require("./utils/database");
 
@@ -22,10 +22,16 @@ app.use(categoryRoutes);
 app.use(subcategoryRoutes);
 app.use(productRoutes);
 app.use(cartRoutes);
+app.use((error, req, res, next) => {
+  const status = error.statusCode || 500;
+  const message = error.message;
+  const data = error.data;
+  res.status(status).json({ status: "error", message: message, description: data[0].msg});
+});
 
 sequelize
-  .sync({ force: true })
-  // .sync()
+  // .sync({ force: true })
+  .sync()
   .then((result) => {
     app.listen(3000);
   })

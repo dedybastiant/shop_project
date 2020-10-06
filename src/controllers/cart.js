@@ -169,3 +169,95 @@ exports.deleteCartItem = async (req, res, next) => {
     .status(200)
     .json({ status: "success", message: "CartItem Successfully Deleted!" });
 };
+
+exports.getCartById = async (req, res, next) => {
+  const userId = req.userId;
+  const cartId = req.params.cartId;
+
+  const cart = await Cart.findByPk(cartId);
+  if (!cart) {
+    return res.status(404).json({ status: "error", message: "No Cart Found!" });
+  }
+  if (!cart.is_active) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Cart Already Deleted!" });
+  }
+  if (cart.user_id != userId) {
+    return res.status(401).json({ status: "error", message: "Unautorized" });
+  }
+  const cartDetail = await CartDetail.findAll({
+    where: {
+      cart_id: cartId,
+    },
+  });
+
+  const cartDetailData = [];
+  cartDetail.map((cart) => {
+    const data = {
+      id: cart.id,
+      productId: cart.product_id,
+      quantity: cart.quantity,
+      price: cart.price,
+      createdBy: cart.createdBy,
+      createdAt: cart.createdAt,
+      updatedBy: cart.updatedBy,
+      updatedAt: cart.updatedAt,
+    };
+    cartDetailData.push(data);
+  });
+
+  const cartData = {
+    id: cart.id,
+    userId: cart.user_id,
+    totalQuantity: cart.total_item,
+    totalPrice: cart.total_price,
+    cartItem: cartDetailData,
+    createdBy: cart.createdBy,
+    createdAt: cart.createdAt,
+    updatedBy: cart.updatedBy,
+    updatedAt: cart.updatedAt,
+  };
+
+  res.status(200).json({ status: "success", data: cartData });
+};
+
+exports.getCartByQuery = async (req, res, next) => {
+  const userId = req.userId;
+
+  const queryUserId = req.query.userId;
+  const queryIsActive = req.query.is_active;
+  const query = {};
+  if (queryUserId) {
+    query.user_id = queryUserId;
+  }
+  if (queryIsActive) {
+    if (queryIsActive === "true") {
+      query.is_active = true;
+    } else if (queryIsActive === "false") {
+      query.is_active = false;
+    }
+  }
+  const carts = await Cart.findAll({ where: query });
+  if (carts.length < 1) {
+    return res.status(404).json({ status: "error", message: "No Cart Found!" });
+  }
+
+  const cartData = [];
+  carts.map((cart) => {
+    const data = {
+      id: cart.id,
+      userId: cart.user_id,
+      totalQuantity: cart.total_item,
+      totalPrice: cart.total_price,
+      is_active: cart.is_active,
+      createdBy: cart.createdBy,
+      createdAt: cart.createdAt,
+      updatedBy: cart.updatedBy,
+      updatedAt: cart.updatedAt,
+    };
+    cartData.push(data);
+  });
+
+  res.status(200).json({ status: "success", data: cartData });
+};
