@@ -1,10 +1,10 @@
 const Product = require("../models/product");
-// const ProductImage = require('../models/product_image');
 const { Sequelize } = require("../utils/database");
 const Op = Sequelize.Op;
 
 exports.addNewProduct = async (req, res, next) => {
-  if (!req.isAuth || req.userRole !== "admin") {
+	console.log(req.files);
+  if (req.userRole !== "admin") {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
 
@@ -15,11 +15,14 @@ exports.addNewProduct = async (req, res, next) => {
   const price = req.body.price;
   const category = req.body.category;
   const subcategory = req.body.subcategory;
-  //   const productImage = req.body.image;
-  const sku = req.body.sku;
-  //   if (!productImage) {
-  //     return res.status(400).json({status: 'Images Should Not Be Empty!'});
-  //   }
+	const sku = req.body.sku;
+	const productImages = {
+		imageUrl: []
+	}
+	await req.files.map(file => {
+		productImages.imageUrl.push(file.path)
+	});
+	console.log(productImages)
   const product = await Product.create({
     product_name: name,
     product_brand: brand,
@@ -28,6 +31,7 @@ exports.addNewProduct = async (req, res, next) => {
     product_category: category,
     product_subcategory: subcategory,
     product_sku: sku,
+    product_images: productImages,
     new_product_flag: true,
     is_active: true,
     createdBy: userId,
